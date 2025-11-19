@@ -37,7 +37,7 @@ GENOME_SIZE = 3000000
 COVERAGE = 50
 REFERENCES = [".".join(SAMPLE_INFO[barcode]["ref_fallback"].split(".")[:-1]) for barcode in SAMPLE_INFO]
 BUSCO_GENUS = "bacteria"
-PILON_ITERATIONS = 1
+
 
 rule all:
     input:
