@@ -1,7 +1,10 @@
-# Nanopore_only_assembly_and_polishing
-Genome assembly and polishing from (long read) Nanopore-only data; originally for HCMV (should be good for bacteria as well)
+# CobraHy
+Hybrid assembly of bacterial genomes utilizing nanopore and illumina reads (COmbined Bacterial Reads Assembly)
 
 # Installation
+
+## Workflow
+Clone repo to machine
 
 ## GTDBTK
 For classification with GTDBTK first a database has to be downloaded.
@@ -21,7 +24,7 @@ When installation completes the following message can be seen:
     Automatic:
 
         1. Run the command "download-db.sh" to automatically download and extract to:
-            /home/simon/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db/
+            /home/user/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db/
 
     Manual:
 
@@ -36,19 +39,20 @@ When installation completes the following message can be seen:
             conda env config vars set GTDBTK_DATA_PATH="/path/to/target/db
 """
 
-Use the automatic versionwith the shell script.
+Use the automatic version with the shell script.
 Within the snakefile in rule classify_gtdbtk, in the shell directive, the first
 line has to be edited to fit to the path given in (1.) e.g.:
 
-"mamba env config vars set GTDBTK_DATA_PATH=/homes/simon/.conda/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
- would be wrong here and had to be changed to 
-"mamba env config vars set GTDBTK_DATA_PATH=/home/simon/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
+!!!ToDo: Add GTDBTK_DATA_PATH to config to avoid editing of code in workflow!!!
 
+"mamba env config vars set GTDBTK_DATA_PATH=/homes/user/.conda/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
+ would be wrong here and had to be changed to 
+"mamba env config vars set GTDBTK_DATA_PATH=/home/user/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
 
 ## PlasClass & PlasFlow
 Both packages can not be installed via conda without trouble.
 Therefore I decided to place them as packages into the pkgs folder.
-THe PlasClass package is small enough so I could include it in my github repository.
+The PlasClass package is small enough so I could include it in my github repository.
 However, PlasFlow is so big (65-85Mb) that I would not want to include it.
 It can be downloaded by cloning the PlasFlow repository into the pkgs folder.
 To avoid stacking repo within repo, the .git folder within PlasFlow package should be removed.
@@ -64,15 +68,13 @@ HOW TO INSTALL TENSORFLOW BEST (remember issue with same source tree as python)
 start with path/to/repo/PlasFlow.py
 
 # Usage
+Edit config/config.yaml according to the requirments of your experiment(s).
+Place the required input data (e.g. folder with fastq.gz) into the data folder so it has the following structure: data/{experiment}/{barcode}.
 
-Create the required snakefile, by copying one of the available snakefiles in smk_workflow (bacterial-hybrid-assembly / Viral-Nanopore-only) to "Snakefile".
-Put the required input data (e.g. folder full with fastq.gz) into the data folder so it has the following structure: data/{experiment}/{barcode}.
-
-For Virus-only Nanopore assembly pipeline can be started with: 
+Start pipeline with (insert desired number of threads for --cores): 
 ```sh
-snakemake --use-conda --cores 32 results/{experiment}/{barcode}/medaka_flye/consensus.fasta results/{experiment}/{barcode}/medaka_canu/consensus.fasta
+snakemake --use-conda --cores 32
 ```
-
 
 # Create DAG graph
 snakemake --dag | dot > DAG.dot
