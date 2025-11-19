@@ -1,0 +1,10 @@
+Experiment: "Example_experiment"
+GenomeSize: 5000000
+Barcodes: [
+    "barcode01",
+    "barcode02",
+    "barcode03",
+    ]
+Assemblers: ["flye"]  # "canu"
+Coverage: 50
+Busco_genus: "bacteria"

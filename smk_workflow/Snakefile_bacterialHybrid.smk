@@ -7,36 +7,23 @@ from collections import defaultdict
 include: "rules/Pilon.smk"
 include: "rules/Common.smk"
 
+configfile: "config/config.yaml"
 
-EXPERIMENT = "SM0026_bacterial_genomes_KP"
-BARCODES = [
-    "barcode01",
-    "barcode02",
-    "barcode03",
-    "barcode04",
-    "barcode05",
-    "barcode06",
-    "barcode07",
-    "barcode08",
-    "barcode09",
-    "barcode10",
-    "barcode11",
-    "barcode12",
-    "barcode13",
-    ]
+EXPERIMENT = config["Experiment"]
+BARCODES = config["Barcodes"]
+ASSEMBLERS = config["Assemblers"]
+GENOME_SIZE = config["GenomeSize"]
+COVERAGE = config["Coverage"]
+BUSCO_GENUS = config["Busco_genus"]
 
 with open(os.path.join("data", EXPERIMENT, "Sample_Info.json")) as sinfo:
     SAMPLE_INFO = {k:v for k,v in json.load(sinfo).items() if k in BARCODES}
-    # print("SAMPLE_INFO", SAMPLE_INFO)
 
 with open(os.path.join("resources", "GTDBTK_classification_info.json")) as gcinfo:
     GTDB_TRANSL = json.load(gcinfo)
 
-ASSEMBLERS = ["flye"] # , "canu"
-GENOME_SIZE = 3000000
-COVERAGE = 50
 REFERENCES = [".".join(SAMPLE_INFO[barcode]["ref_fallback"].split(".")[:-1]) for barcode in SAMPLE_INFO]
-BUSCO_GENUS = "bacteria"
+
 
 
 rule all:
@@ -188,26 +175,6 @@ rule dnadiff:
         "dnadiff  -p {params.prefix} {input.reference} {input.asm} 2>&1 > {log}"
 
 
-# rule prokka_expected_ref:
-#     input:
-#         # asm="results/{experiment}/{barcode}/medaka_{assembler}/consensus.fasta",
-#         asm="results/{experiment}/{barcode}/circl_fixstart/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.oriented.fasta",
-#         prot_file=get_ref_proteins
-#     output:
-#         protgbk_dir=directory("results/{experiment}/{barcode}/prokka_medaka_{assembler}_protgbk_exp"),
-#         protg_tsv="results/{experiment}/{barcode}/prokka_medaka_{assembler}_protgbk_exp/{experiment}_{barcode}_{assembler}_prokka_protgbk_exp.tsv"
-#     params:
-#         genus=get_prokka_genus,
-#         # species=get_prokka_species
-#     log:
-#         "logs/{experiment}/{barcode}/prokka_medaka_{assembler}_exp.log"
-#     conda:
-#         "envs/prokka.yaml"
-#     shell:
-#         # "prokka --kingdom Bacteria --genus {params.genus} --species {params.species} {input.asm} --usegenus --outdir {output.genusdb_dir} --prefix {wildcards.experiment}_{wildcards.barcode}_{wildcards.assembler}_prokka_genusdb --force && " 
-#         "prokka --proteins {input.prot_file} {input.asm} --outdir {output.protgbk_dir} --prefix {wildcards.experiment}_{wildcards.barcode}_{wildcards.assembler}_prokka_protgbk_exp --force 2>&1 > {log}"
-
-
 rule prokka_gtdbtk_ref:
     input:
         "results/{experiment}/{barcode}/medaka_{assembler}_pilon3_gtdbtk/gtdbtk_classification.txt",
@@ -222,7 +189,6 @@ rule prokka_gtdbtk_ref:
     conda:
         "envs/prokka.yaml"
     shell:
-        # "prokka --kingdom Bacteria --genus {params.genus} --species {params.species} {input.asm} --usegenus --outdir {output.genusdb_dir} --prefix {wildcards.experiment}_{wildcards.barcode}_{wildcards.assembler}_prokka_genusdb --force && " 
         "prokka --proteins {input.prot_file} {input.asm} --outdir {output.protgbk_dir} --prefix {wildcards.experiment}_{wildcards.barcode}_{wildcards.assembler}_prokka_protgbk_class --force 2>&1 > {log}"
 
 
@@ -290,7 +256,7 @@ rule busco_generate_plot:
 
 rule fastqc_illumina_before:
     input:
-        "results/{experiment}/{barcode}/{experiment}_{barcode}_all_sqfilt.fasta", # this is not required as input for fastqc, but supplies the necessary wildcards and ensures 
+        "results/{experiment}/{barcode}/{experiment}_{barcode}_all_sqfilt.fasta",
         ilmn_reads=get_ilmn_reads
     output:
         "results/{experiment}/{barcode}/ilmn_fastqc_before/fastqc_complete.flag"
@@ -350,7 +316,7 @@ rule nanoplot:
 
 checkpoint clip_adapters_sm:
     input:
-        "results/{experiment}/{barcode}/ilmn_fastqc_before/fastqc_complete.flag", # this is not required as input for fastqc, but supplies the necessary wildcards and ensures 
+        "results/{experiment}/{barcode}/ilmn_fastqc_before/fastqc_complete.flag",
         ilmn_reads=get_ilmn_reads
     output:
         directory("results/{experiment}/{barcode}/ilmn_clip_sm")
@@ -393,24 +359,6 @@ rule assembly_stats:
         "python3 scripts/assembly_statistics_4_bacterial.py {input} > {output}"
 
 
-# rule circlator_all:
-#     input:
-#         asm = "results/{experiment}/{barcode}/{assembly}.fasta",
-#         ont_reads = "results/{experiment}/{barcode}/{experiment}_{barcode}_all_sqfilt.fasta"
-#     output:
-#         "results/{experiment}/{barcode}/circl_all/{assembly}.oriented.fasta"#,
-#         # directory("results/{experiment}/{barcode}/circlator")
-#     params:
-#         # out_prefix = "results/{experiment}/{barcode}/circl_all/{assembly}.oriented"
-#         out_dir = directory("results/{experiment}/{barcode}/circl_all")
-#     conda:
-#         "envs/circlator.yaml"
-#     log:
-#         "logs/{experiment}/{barcode}/{assembly}/circlator_all.log"
-#     shell:
-#         "circlator all {input.asm} {input.ont_reads} {params.out_dir} 2>&1 > {log}"
-
-
 rule classify_gtdbtk:
     input:
         asm = "results/{experiment}/{barcode}/circl_fixstart/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.oriented.fasta"
@@ -426,9 +374,7 @@ rule classify_gtdbtk:
     log:
         "logs/{experiment}/{barcode}/medaka_{assembler}_pilon3/classify_gtdbtk.log"
     shell:
-        # "gtdbtk classify_wf --genome_dir <my_genomes> --out_dir <output_dir> 2>&1 > {log}"
         "mamba env config vars set GTDBTK_DATA_PATH=/home/simon/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
-        # "mamba env config vars set GTDBTK_DATA_PATH=/homes/simon/.conda/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
         "gtdbtk classify_wf --genome_dir {params.genome_dir} --out_dir {params.out_dir} --extension fasta --cpu {threads} --mash_db resources 2>&1 > {log}"
 
 
@@ -444,7 +390,7 @@ rule set_gtdbtk_classification:
             data = gtdbtk_out.read().split("\n")
             keys = data[0].strip().split("\t")
             data = [l for l in data if len(l.strip())>0][1:]
-            # print(f"INFO: {input} contains {len(data)} call(s)")
+
             for line in data:
                 data = line.strip().split("\t")
                 ddct = dict(zip(keys, data))
@@ -453,9 +399,9 @@ rule set_gtdbtk_classification:
                 class_dct = dict(
                     [call.split("__") for call in class_tree.split(";")]
                     )
-                # print("class_dct", class_dct)
+
                 class_dct = {GTDB_TRANSL[k]:v for k,v in class_dct.items()}
-                # print("class_dct", class_dct)
+
                 class_cats = [
                     "gtdb_species",
                     "gtdb_genus",
@@ -469,22 +415,18 @@ rule set_gtdbtk_classification:
                 for cat in class_cats:
                     try:
                         gtdbtk_call = class_dct[cat]
-                        # print(f"INFO: Using {cat} as gtbdtk call category.")
-                        # print(f"GTDBTK call: {class_dct[cat]}")
+
                         if cat=="gtdb_species":
                             spec_call = True
                         break
                     except:
                         pass
-                        # print(f"WARNING: gtdbtk did not yield a {cat} call.")
+
                 out.write(gtdbtk_call)
                 for cat in class_dct:
                     SAMPLE_INFO[wildcards.barcode][cat] = class_dct[cat]
                 SAMPLE_INFO[wildcards.barcode]["gtdb_ref"] = ddct["fastani_reference"]
-                # print(f"SAMPLE_INFO: {SAMPLE_INFO}")
-                # print(
-                #     f"Suggested reference: {SAMPLE_INFO[wildcards.barcode]['gtdb_ref']}"
-                #     )
+
                 with open(output[1], "w") as sinfo:
                     augm_sinfo = json.dumps(
                         {wildcards.barcode: SAMPLE_INFO[wildcards.barcode]},
@@ -500,9 +442,6 @@ checkpoint update_sample_info_gtdbtk_class:
         expand("results/{experiment}/medaka_{assembler}_pilon3_gtdbtk_sinfo/gtdbtk_sinfo_mod.json", experiment=EXPERIMENT, assembler=ASSEMBLERS),
         expand("results/{experiment}/{barcode}/medaka_{assembler}_pilon3_gtdbtk_sinfo/update_sinfo_mod.flag", experiment=EXPERIMENT, barcode=BARCODES, assembler=ASSEMBLERS)
     run:
-        # print("Input of update_sample_info_gtdbtk_class", input)
-        # print("output of update_sample_info_gtdbtk_class", output)
-
         inf_by_asm = defaultdict(list)
         for asm in ASSEMBLERS:
             for in_file in input:
@@ -521,7 +460,6 @@ checkpoint update_sample_info_gtdbtk_class:
                 flag = f"results/{exp}/{bc}/medaka_{asm}_pilon3_gtdbtk_sinfo/update_sinfo_mod.flag"
                 with open(flag, "w") as sflag:
                     sflag.write(flag)
-            # print(f"SAMPLE_INFO for {asm} from update_sample_info_gtdbtk_class", SAMPLE_INFO)
 
             if not os.path.exists(f"results/{exp}/medaka_{asm}_pilon3_gtdbtk_sinfo"):
                 os.mkdir(f"results/{exp}/medaka_{asm}_pilon3_gtdbtk_sinfo")
@@ -547,7 +485,7 @@ checkpoint confirm_or_get_reference:
             "r"
             ) as sinfo:
             sinfo_mod = json.load(sinfo)
-            # print("sinfo_mod", sinfo_mod)
+
         dwnld = set()
         for sample in sinfo_mod:
             messages = []
@@ -558,7 +496,7 @@ checkpoint confirm_or_get_reference:
             if len(avail_ref) > 0:
                 m1 = f"Signature of best ref for {sample} assembled with {wildcards.assembler} already present in resources"
                 messages.append(m1)
-                # print(m1) 
+
             corr_ext = [f.split(".")[-1] for f in avail_ref if f.split(".")[-1] in req_ext]
             ref_type = {"fna": "asm", "fasta": "asm", "fa": "asm", "faa": "prot", "gbk": "prot", "gb": "prot"}
             ref_set = {ref_type[ext] for ext in corr_ext}
@@ -568,16 +506,16 @@ checkpoint confirm_or_get_reference:
                 m2 = f"Some reference file/s is/are missing. Adding {best_ref} to download set."
                 dwnld.add(best_ref)
             messages.append(m2)
-            # print(m2)
+
             out_flag = open(output[0], "w")
             out_flag.close()
             with open(f"results/{EXPERIMENT}/medaka_{wildcards.assembler}_pilon3_gtdbtk_sinfo/confirm_or_get_reference.flag", "a") as flag:
                 for m in messages:
                     flag.write(f"{m}\n")
-        # print("dwnld_set", dwnld)
+
         os.makedirs(f"results/{EXPERIMENT}/medaka_{wildcards.assembler}_pilon3_gtdbtk_dwnld", exist_ok=True)
         for ref in dwnld:
-            # print("Writing download file for: ", ref)
+
             with open(f"results/{EXPERIMENT}/medaka_{wildcards.assembler}_pilon3_gtdbtk_dwnld/{ref}.dwnld", "w") as lst:
                 lst.write(ref)
 
@@ -611,6 +549,99 @@ checkpoint download_references:
         "touch results/{wildcards.experiment}/medaka_{wildcards.assembler}_dwnlds/download_done.flag"
 
 
+rule plasclass:
+    input:
+        asm = "results/{experiment}/{barcode}/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.fasta"
+    output:
+        "results/{experiment}/{barcode}/medaka_{assembler}_pilon3_plasclass/plasclass.probs.out"
+    threads:
+        8
+    conda:
+        "envs/plasclass.yaml"
+    log:
+        "logs/{experiment}/{barcode}/medaka_{assembler}_pilon3/plasclass.log"
+    shell:
+        "python pkgs/PlasClass/classify_fasta.py -f {input} -o {output} -p {threads}"
+        
+
+rule mummer2circos_single:
+    input:
+        "results/{experiment}/{barcode}/medaka_{assembler}_pilon3_gtdbtk/gtdbtk.bac120.summary.tsv",
+        sinfo_flag="results/{experiment}/{barcode}/medaka_{assembler}_pilon3_gtdbtk_sinfo/update_sinfo_mod.flag",
+        dwnld_flag=expand("results/{experiment}/medaka_{assembler}_dwnlds/download_done.flag", experiment=EXPERIMENT, assembler=ASSEMBLERS),
+        asm="results/{experiment}/{barcode}/circl_fixstart/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.oriented.fasta",
+        ref=get_reference_file
+    output:
+        "results/{experiment}/{barcode}/medaka_{assembler}_pilon3_circos/{experiment}_{barcode}_circos.svg"
+    params:
+        prefix="{experiment}_{barcode}_circos",
+        workdir="results/{experiment}/{barcode}/medaka_{assembler}_pilon3_circos"
+    threads:
+        4
+    conda:
+        "envs/mummer2circos.yaml"
+    log:
+        "logs/{experiment}/{barcode}/medaka_{assembler}_pilon3/mummer2circos.log"
+    shell:
+        "mkdir -p {params.workdir} && "
+        "cd {params.workdir} && "
+        "mummer2circos -f -l -r ../../../../{input.ref} -q ../../../../{input.asm} -o {params.prefix}"
+        #"python3 pkgs/mummer2circos/mummer2circos/mummer2circos.py -l -r {input.ref} -q {input.asm} -o {params.prefix}"
+
+
+rule assemblytics:
+    input:
+        "results/{experiment}/{barcode}/dnadiff/medaka_{assembler}_pilon3.oriented.delta"
+    output:
+        "results/{experiment}/{barcode}/assemblytics/{barcode}_medaka_{assembler}_pilon3.oriented.coords.csv"
+    params:
+        output_prefix="results/{experiment}/{barcode}/assemblytics/{barcode}_medaka_{assembler}_pilon3.oriented",
+        unique_anchor_length=10000,
+        min_variant_size=10000,
+        max_variant_size=1,
+    conda:
+        "envs/assemblytics.yaml"
+    shell:
+        "Assemblytics {input} {params.output_prefix} {params.unique_anchor_length} {params.min_variant_size} {params.max_variant_size}"
+
+
+# rule prokka_expected_ref:
+#     input:
+#         # asm="results/{experiment}/{barcode}/medaka_{assembler}/consensus.fasta",
+#         asm="results/{experiment}/{barcode}/circl_fixstart/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.oriented.fasta",
+#         prot_file=get_ref_proteins
+#     output:
+#         protgbk_dir=directory("results/{experiment}/{barcode}/prokka_medaka_{assembler}_protgbk_exp"),
+#         protg_tsv="results/{experiment}/{barcode}/prokka_medaka_{assembler}_protgbk_exp/{experiment}_{barcode}_{assembler}_prokka_protgbk_exp.tsv"
+#     params:
+#         genus=get_prokka_genus,
+#         # species=get_prokka_species
+#     log:
+#         "logs/{experiment}/{barcode}/prokka_medaka_{assembler}_exp.log"
+#     conda:
+#         "envs/prokka.yaml"
+#     shell:
+#         # "prokka --kingdom Bacteria --genus {params.genus} --species {params.species} {input.asm} --usegenus --outdir {output.genusdb_dir} --prefix {wildcards.experiment}_{wildcards.barcode}_{wildcards.assembler}_prokka_genusdb --force && " 
+#         "prokka --proteins {input.prot_file} {input.asm} --outdir {output.protgbk_dir} --prefix {wildcards.experiment}_{wildcards.barcode}_{wildcards.assembler}_prokka_protgbk_exp --force 2>&1 > {log}"
+# 
+# rule circlator_all:
+#     input:
+#         asm = "results/{experiment}/{barcode}/{assembly}.fasta",
+#         ont_reads = "results/{experiment}/{barcode}/{experiment}_{barcode}_all_sqfilt.fasta"
+#     output:
+#         "results/{experiment}/{barcode}/circl_all/{assembly}.oriented.fasta"#,
+#         # directory("results/{experiment}/{barcode}/circlator")
+#     params:
+#         # out_prefix = "results/{experiment}/{barcode}/circl_all/{assembly}.oriented"
+#         out_dir = directory("results/{experiment}/{barcode}/circl_all")
+#     conda:
+#         "envs/circlator.yaml"
+#     log:
+#         "logs/{experiment}/{barcode}/{assembly}/circlator_all.log"
+#     shell:
+#         "circlator all {input.asm} {input.ont_reads} {params.out_dir} 2>&1 > {log}"
+# 
+# 
 # rule plasflow:
 #     input:
 #         asm = "results/{experiment}/{barcode}/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.fasta"
@@ -630,80 +661,4 @@ checkpoint download_references:
 #         # "curr_env=$(conda info --env | grep '*' | rev | cut -d' ' -f1 | rev) && "
 #         # "python $curr_env/lib/python3.5/site-packages/PlasFlow/PlasFlow.py --input {input} --output {output} 2>&1 > {log}"
 #         "python pkgs/PlasFlow/PlasFlow.py --input {input} --output {output} 2>&1 > {log}"
-
-
-rule plasclass:
-    input:
-        asm = "results/{experiment}/{barcode}/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.fasta" # consider using .oriented
-    output:
-        "results/{experiment}/{barcode}/medaka_{assembler}_pilon3_plasclass/plasclass.probs.out"
-    threads:
-        8
-    conda:
-        "envs/plasclass.yaml"
-    log:
-        "logs/{experiment}/{barcode}/medaka_{assembler}_pilon3/plasclass.log"
-    shell:
-        # "curr_env=$(conda info --env | grep '*' | rev | cut -d' ' -f1 | rev) && "
-        # "python $curr_env/lib/python3.9/site-packages/plasclass/plasclass.py -f {input} -o {output} -p {threads}"
-        "python pkgs/PlasClass/classify_fasta.py -f {input} -o {output} -p {threads}"
-        
-
-rule mummer2circos_single:
-    input:
-        "results/{experiment}/{barcode}/medaka_{assembler}_pilon3_gtdbtk/gtdbtk.bac120.summary.tsv",
-        sinfo_flag="results/{experiment}/{barcode}/medaka_{assembler}_pilon3_gtdbtk_sinfo/update_sinfo_mod.flag",
-        dwnld_flag=expand("results/{experiment}/medaka_{assembler}_dwnlds/download_done.flag", experiment=EXPERIMENT, assembler=ASSEMBLERS),
-        asm="results/{experiment}/{barcode}/circl_fixstart/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.oriented.fasta",
-        ref=get_reference_file
-    output:
-        "results/{experiment}/{barcode}/medaka_{assembler}_pilon3_circos/{experiment}_{barcode}_circos.svg"
-    params:
-        prefix="{experiment}_{barcode}_circos",
-        workdir="results/{experiment}/{barcode}/medaka_{assembler}_pilon3_circos"
-    threads:
-        4
-    conda:
-        # "envs/mummer2circos_pkg.yaml"
-        "envs/mummer2circos.yaml"
-    log:
-        "logs/{experiment}/{barcode}/medaka_{assembler}_pilon3/mummer2circos.log"
-    shell:
-        "mkdir -p {params.workdir} && "
-        "cd {params.workdir} && "
-        "mummer2circos -f -l -r ../../../../{input.ref} -q ../../../../{input.asm} -o {params.prefix}"
-        #"python3 pkgs/mummer2circos/mummer2circos/mummer2circos.py -l -r {input.ref} -q {input.asm} -o {params.prefix}"
-
-
-rule assemblytics:
-    input:
-        "results/{experiment}/{barcode}/dnadiff/medaka_{assembler}_pilon3.oriented.delta"
-    output:
-        # "results/{experiment}/{barcode}/assemblytics/{barcode}_medaka_{assembler}_pilon3.oriented.Assemblytics.Dotplot_filtered.png"
-        "results/{experiment}/{barcode}/assemblytics/{barcode}_medaka_{assembler}_pilon3.oriented.coords.csv"
-    params:
-        output_prefix="results/{experiment}/{barcode}/assemblytics/{barcode}_medaka_{assembler}_pilon3.oriented",
-        unique_anchor_length=10000,
-        min_variant_size=10000,
-        max_variant_size=1,
-    conda:
-        "envs/assemblytics.yaml"
-    shell:
-        "Assemblytics {input} {params.output_prefix} {params.unique_anchor_length} {params.min_variant_size} {params.max_variant_size}"
-
-# add a third round of pilon polishing; checked
-# classification; checked
-# Plasmids; checked
-# transfer BUSCO plot generation downstream of classifciation; checked
-# Synteny; checked - covered by assemblytics
-# Detect and analyze variants: assemblytics; checked
-# Circular plot with GC skew etc.; checked
-# Quality assessment (QUAST or similar); probably mostly covered by assemblytics
-# find a way to remove clipped illumina reads (temp() not working due to unknown name)
-# write a rule to generate assembly graphs from flye (canu also?) assembly_info.gv files using graphviz with following commands:
-    # dot {results}/{barcode}/flye/assembly_graph.gv > {results}/{barcode}/flye/{barcode}_asm_graph.dot &&
-    # dot -Tpng {results}/{barcode}/flye/{barcode}_asm_graph.dot -o {results}/{barcode}/flye/{barcode}_asm_graph.png
-# use {results}/{barcode}/flye/assembly_graph.gv as input file, which would necessitate to add it to flye output files as graph=...
-# migth also be tried with gfa file
-# alternative for graphviz could be bandage
 

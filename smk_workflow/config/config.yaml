@@ -1,0 +1,6 @@
+Experiment:
+GenomeSize: 
+Barcodes: []
+Assemblers: []  # "flye", "canu"
+Coverage:
+Busco_genus: "bacteria"
