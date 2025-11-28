@@ -12,9 +12,7 @@ rule bwa_ilmn_to_rawasm:
         bam=temp("results/{experiment}/{barcode}/medaka_{assembler}_bwa/idx1_aln_ilm_{experiment}_{barcode}.bam")
     params:
         prefix="idx1_medaka_{assembler}_{experiment}_{barcode}",
-        outdir="results/{experiment}/{barcode}/medaka_{assembler}_bwa"#,
-        # bam="results/{experiment}/{barcode}/medaka_{assembler}_bwa/idx1_aln_ilm_{experiment}_{barcode}.bam"
-        # sam_file="idx1_aln_ilm_{experiment}_{barcode}.sam",
+        outdir="results/{experiment}/{barcode}/medaka_{assembler}_bwa"
     threads:
         16
     conda:
@@ -61,12 +59,9 @@ rule pilon_iteration_2:
         sort="results/{experiment}/{barcode}/medaka_{assembler}_pilon2/idx2_medaka_{assembler}_ilmn2pilon1.bam.sort",
         asm="results/{experiment}/{barcode}/medaka_{assembler}_pilon2/medaka_{assembler}_pilon2.fasta"
     params:
-        # threads=8,
         outdir="results/{experiment}/{barcode}/medaka_{assembler}_pilon2",
         bwa_prefix="results/{experiment}/{barcode}/medaka_{assembler}_pilon2/idx2_medaka_{assembler}_pilon1",
         pilon_prefix="medaka_{assembler}_pilon2",
-        # sam="results/{experiment}/{barcode}/medaka_{assembler}_pilon2/medaka_{assembler}_ilmn2pilon1.sam",
-        # bam="results/{experiment}/{barcode}/medaka_{assembler}_pilon2/idx2_medaka_{assembler}_ilmn2pilon1.bam"
     threads:
         8
     conda:
@@ -93,7 +88,6 @@ rule pilon_iteration_3:
         sort="results/{experiment}/{barcode}/medaka_{assembler}_pilon3/idx2_medaka_{assembler}_ilmn2pilon_2.bam.sort",
         asm="results/{experiment}/{barcode}/medaka_{assembler}_pilon3/medaka_{assembler}_pilon3.fasta"
     params:
-        # threads=8,
         outdir="results/{experiment}/{barcode}/medaka_{assembler}_pilon3",
         bwa_prefix="results/{experiment}/{barcode}/medaka_{assembler}_pilon3/idx3_medaka_{assembler}_pilon2",
         pilon_prefix="medaka_{assembler}_pilon3",
