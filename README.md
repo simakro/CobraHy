@@ -69,7 +69,38 @@ start with path/to/repo/PlasFlow.py
 
 # Usage
 Edit config/config.yaml according to the requirments of your experiment(s).
-Place the required input data (e.g. folder with fastq.gz) into the data folder so it has the following structure: data/{experiment}/{barcode}.
+Create an experiment folder in workflow/data (e.g. "workflow/data/new_experiment").
+Generate a Sample_Info.json file that describes each sample/barcode. Entries for fallbacks are optional and only come to bear if classification can't find a related genome.
+Sample_Info.json example:
+```sh
+{
+    "barcode01": {
+        "name": "Sample1",
+        "ref": "",
+        "ref_fallback": "Bacterial_assembly_to_use_as_fallback_ref.fna",
+        "genus_fallback": "Some_Genus",
+        "species_fallback": "Some_species",
+        "illumina": [
+            "short-reads/A1/A1_ILLUMINA_READS_L1_1.fq.gz",
+            "short-reads/A1/A1_ILLUMINA_READS_L1_2.fq.gz"
+        ]
+    },
+    "barcode02": {
+        "name": "Sample2",
+        "ref": "",
+        "ref_fallback": "Bacterial_assembly_to_use_as_fallback_ref.fna",
+        "genus_fallback": "Some_Genus",
+        "species_fallback": "Some_species",
+        "illumina": [
+            "short-reads/A2/A2_ILLUMINA_READS_L1_1.fq.gz",
+            "short-reads/A2/A2_ILLUMINA_READS_L1_2.fq.gz"
+        ]
+    },
+}
+```
+
+Place the required long-read (nanopore) input data (an individual folder of fastq(.gz) file/s for each barcode) into the data folder so it has the following structure: data/{experiment}/{barcodeX}.
+Place the associated short-reads (illumina) in a separate sub-folder in the experiment directory so it has the following structure: data/{experiment}/short-reads/{short_reads_for_ont_bcX}.
 
 Start pipeline with (insert desired number of threads for --cores): 
 ```sh

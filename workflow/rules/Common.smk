@@ -113,7 +113,7 @@ def get_busco_graph_outdir(wildcards):
 
 def get_ilmn_reads(wildcards):
     files = SAMPLE_INFO[wildcards.barcode]["illumina"]
-    path = os.path.join("data", wildcards.experiment, "short-reads")
+    path = os.path.join("data", wildcards.experiment)
     paths = [os.path.join(path, f) for f in files]
     # both_space_sep = f"{paths[0]} {paths[1]}" 
     # returning the paths-list works as input for all cli commands;
