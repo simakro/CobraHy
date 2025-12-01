@@ -1,0 +1,9 @@
+{
+    "d": "gtdb_domain",
+    "p": "gtdb_phylum",
+    "c": "gtdb_class",
+    "o": "gtdb_order",
+    "f": "gtdb_family",
+    "g": "gtdb_genus",
+    "s": "gtdb_species"
+}
