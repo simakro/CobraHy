@@ -1,2 +1,3 @@
+!Snakefile
 .snakemake
 busco_downloads
