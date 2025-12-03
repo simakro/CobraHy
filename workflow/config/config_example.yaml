@@ -8,3 +8,4 @@ Barcodes: [
 Assemblers: ["flye"]  # "canu"
 Coverage: 50
 Busco_genus: "bacteria"
+gtdbtk_db: "/home/user/your_conda_mamba_installation/envs/gtdbtk/share/gtdbtk-2.3.2/db"

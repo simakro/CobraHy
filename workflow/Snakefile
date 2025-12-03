@@ -15,6 +15,7 @@ ASSEMBLERS = config["Assemblers"]
 GENOME_SIZE = config["GenomeSize"]
 COVERAGE = config["Coverage"]
 BUSCO_GENUS = config["Busco_genus"]
+GTDBTK_DB = config["gtdbtk_db"]
 
 with open(os.path.join("data", EXPERIMENT, "Sample_Info.json")) as sinfo:
     SAMPLE_INFO = {k:v for k,v in json.load(sinfo).items() if k in BARCODES}
@@ -374,7 +375,8 @@ rule classify_gtdbtk:
     log:
         "logs/{experiment}/{barcode}/medaka_{assembler}_pilon3/classify_gtdbtk.log"
     shell:
-        "mamba env config vars set GTDBTK_DATA_PATH=/home/simon/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
+        # "mamba env config vars set GTDBTK_DATA_PATH=/home/simon/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
+        "mamba env config vars set GTDBTK_DATA_PATH={GTDBTK_DB} && "
         "gtdbtk classify_wf --genome_dir {params.genome_dir} --out_dir {params.out_dir} --extension fasta --cpu {threads} --mash_db resources 2>&1 > {log}"
 
 

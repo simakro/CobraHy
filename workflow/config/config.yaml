@@ -4,3 +4,4 @@ Barcodes: ["barcode02"]
 Assemblers: ["flye"]  # "flye", "canu"
 Coverage: 50
 Busco_genus: "bacteria"
+gtdbtk_db: "/home/simon/miniforge3/envs/gtdbtk/share/gtdbtk-2.3.2/db"

@@ -7,7 +7,12 @@ Hybrid assembly of bacterial genomes utilizing nanopore and illumina reads (COmb
 Clone repo to machine
 
 ## GTDBTK
-For classification with GTDBTK first a database has to be downloaded.
+Although CobraHy does internally create a conda environment for GTDBTK, the database download is not included,
+because the file size is huge (78Gb).
+Therefore a database has to be downloaded separately. The location of the DB can then be provided to the workflow
+through the config.yaml.
+
+"""
 For this:
     1. create a new conda environment on the same machine you intend to run the workflow:
         conda create -n gtdbtk
@@ -15,8 +20,9 @@ For this:
         conda activate gtdbtk
     3. install the tool:
         conda install -c bioconda gtdbtk=2.3.2
+"""
 
-When installation completes the following message can be seen:
+When installation completes a message following message can be seen:
 """
     GTDB-Tk v2.3.2 requires ~78G of external data which needs to be downloaded
     and extracted. This can be done automatically, or manually.
@@ -24,7 +30,7 @@ When installation completes the following message can be seen:
     Automatic:
 
         1. Run the command "download-db.sh" to automatically download and extract to:
-            /home/user/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db/
+            /home/user/miniforge/envs/gtdbtk/share/gtdbtk-2.3.2/db/
 
     Manual:
 
