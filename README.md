@@ -83,9 +83,24 @@ start with path/to/repo/PlasFlow.py
 
 
 # Usage
-Edit config/config.yaml according to the requirments of your experiment(s).
+
+## Preparations
+Create a config/config.yaml according to the requirments of your experiment(s). Example:
+
+    Experiment: "example1"
+    GenomeSize: 5000000
+    Barcodes: ["barcode01", "barcode02"]
+    Assemblers: ["flye"]  # "flye", "canu"
+    Coverage: 50
+    Busco_genus: "bacteria"
+    gtdbtk_db: "/home/user/miniforge3/envs/gtdbtk/share/gtdbtk-2.3.2/db"
+
 Create an experiment folder in workflow/data (e.g. "workflow/data/new_experiment").
+Place the required long-read (nanopore) input data (an individual folder of fastq(.gz) file/s for each barcode) into the experiment folder in the data directory so it has the following structure: data/{experiment}/{barcodeX}.
+Place the associated short-reads (illumina) in a separate sub-folder in the experiment directory so it has the following structure: data/{experiment}/short-reads/{short_reads_for_ont_bcX}.
+
 Generate a Sample_Info.json file that describes each sample/barcode. Entries for fallbacks are optional and only come to bear if classification can't find a related genome.
+
 Sample_Info.json example:
 ```sh
 {
@@ -114,9 +129,8 @@ Sample_Info.json example:
 }
 ```
 
-Place the required long-read (nanopore) input data (an individual folder of fastq(.gz) file/s for each barcode) into the experiment folder in the data directory so it has the following structure: data/{experiment}/{barcodeX}.
-Place the associated short-reads (illumina) in a separate sub-folder in the experiment directory so it has the following structure: data/{experiment}/short-reads/{short_reads_for_ont_bcX}.
 
+## Start workflow
 To start the pipeline cd into cd CobraHy/workflow and run (insert desired number of threads for --cores): 
 ```sh
 snakemake --use-conda --cores 32
