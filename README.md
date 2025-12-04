@@ -50,24 +50,29 @@ Use the automatic version with the shell script.
 Provide the path of the downloaded database in config/config.yaml via the gtdbtk_db keyword.
 
 ## PlasClass & PlasFlow
-(PlasFLow procedure to be streamlined or replaced in the future)
 Both packages can not be installed via conda without trouble.
-Therefore I decided to place them as packages into the pkgs folder.
-The PlasClass package is small enough so it could be included it the github repository.
-However, PlasFlow is a bit to large (65-85Mb), so I did not not want to include it.
-It can be downloaded by cloning the PlasFlow repository into the pkgs folder.
-To avoid stacking repo within repo, the .git folder within PlasFlow package should be removed.
-!!!It is extremely important to be careful to only delete the .git in PlasFLow and not the main workflow!!!
-Thus change dir into PlasFLow and run rm .git only there.
+
+### PlasClass
+The PlasClass package was small enough to have been included in this git repo in the pkgs folder.
+
+### PlasFlow (deprecated; not currently included)
+PlasFlow still works very nicely and offers some functionality other packages don't,
+but it is not maintained anymore and extremely cumbersome to install.
+Inclusion as package was also not a good option partly due to its size (65-85Mb).
+Therefore it is currently not an active part of the workflow. For potential future
+reintegration or additional usage:
 
 Plasflow installation:
 
     conda create -n plasflow python=3.5
     conda install -c bioconda perl-bioperl perl-getopt-long
     conda install -c anaconda pandas=0.18
-    clone plasflow repository
-    HOW TO INSTALL TENSORFLOW BEST (remember issue with same source tree as python)
-    start with path/to/repo/PlasFlow.py
+    git clone https://github.com/smaegol/PlasFlow.git
+
+When installing tensorflow mind potential issues with same source tree as python.
+It is not recommend to clone the plasflow repo into the packages folder, 
+since this would require removal of plasflow .git to avoid conflicts.
+start with path/to/repo/PlasFlow.py
 
 
 # Usage

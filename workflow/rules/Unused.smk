@@ -53,11 +53,13 @@
 #     shell:
 #         # "curr_env=$(conda info --env | grep '*' | rev | cut -d' ' -f1 | rev) && "
 #         # "python $curr_env/lib/python3.5/site-packages/PlasFlow/PlasFlow.py --input {input} --output {output} 2>&1 > {log}"
-#         "python pkgs/PlasFlow/PlasFlow.py --input {input} --output {output} 2>&1 > {log}"
+#         "python path_to/PlasFlow/PlasFlow.py --input {input} --output {output} 2>&1 > {log}"
 
 
 # potential tools for adapter clipping/trimming: Scythe, Trimmomatic, cutadapt
-# adapter clipping tested and discarded: trim_galore (wrapping cutadapt together with fastqc)
+# testing was not satisfactory
+# also tested and discarded: trim_galore (wrapping cutadapt together with fastqc)
+
 
 # potential tools for quality trimming: Sickle, Trimmomatic, 
 
