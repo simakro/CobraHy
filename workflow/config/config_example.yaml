@@ -1,11 +1,11 @@
 Experiment: "Example_experiment"
-GenomeSize: 5000000
+GenomeSize: 5000000  # Estimated genome size
 Barcodes: [
     "barcode01",
     "barcode02",
     "barcode03",
     ]
 Assemblers: ["flye"]  # "canu"
-Coverage: 50
+Coverage: 60  # target coverage up to which long high-quality reads are selected from higher input coverage
 Busco_genus: "bacteria"
 gtdbtk_db: "/home/user/your_conda_mamba_installation/envs/gtdbtk/share/gtdbtk-2.3.2/db"

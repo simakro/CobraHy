@@ -85,13 +85,13 @@ start with path/to/repo/PlasFlow.py
 # Usage
 
 ## Preparations
-Create a config/config.yaml according to the requirments of your experiment(s). Example:
+Create a config/config.yaml according to the requirements of your experiment(s). Example:
 
     Experiment: "example1"
-    GenomeSize: 5000000
+    GenomeSize: 5000000  # Estimated genome size
     Barcodes: ["barcode01", "barcode02"]
     Assemblers: ["flye"]  # "flye", "canu"
-    Coverage: 50
+    Coverage: 60  # target coverage up to which long high-quality reads are selected from higher input coverage
     Busco_genus: "bacteria"
     gtdbtk_db: "/home/user/miniforge3/envs/gtdbtk/share/gtdbtk-2.3.2/db"
 
