@@ -322,7 +322,7 @@ checkpoint clip_adapters_sm:
     output:
         directory("results/{experiment}/{barcode}/ilmn_clip_sm")
     params:
-        adapters="resources/adapters_all_trimmomatic_condensed.fasta"
+        adapters="resources/illumina_adapters_tm_cond.fasta"
     conda:
         "envs/fastqc.yaml"
     log:

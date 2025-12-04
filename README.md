@@ -12,18 +12,19 @@ because the file size is huge (78Gb).
 Therefore a database has to be downloaded separately. The location of the DB can then be provided to the workflow
 through the config.yaml.
 
-"""
+
 For this:
+
     1. create a new conda environment on the same machine you intend to run the workflow:
         conda create -n gtdbtk
     2. change into this env
         conda activate gtdbtk
     3. install the tool:
         conda install -c bioconda gtdbtk=2.3.2
-"""
+
 
 When installation completes a message following message can be seen:
-"""
+
     GTDB-Tk v2.3.2 requires ~78G of external data which needs to be downloaded
     and extracted. This can be done automatically, or manually.
 
@@ -43,17 +44,10 @@ When installation completes a message following message can be seen:
 
         3. Set the GTDBTK_DATA_PATH environment variable by running:
             conda env config vars set GTDBTK_DATA_PATH="/path/to/target/db
-"""
+
 
 Use the automatic version with the shell script.
-Within the snakefile in rule classify_gtdbtk, in the shell directive, the first
-line has to be edited to fit to the path given in (1.) e.g.:
-
-!!!ToDo: Add GTDBTK_DATA_PATH to config to avoid editing of code in workflow!!!
-
-"mamba env config vars set GTDBTK_DATA_PATH=/homes/user/.conda/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
- would be wrong here and had to be changed to 
-"mamba env config vars set GTDBTK_DATA_PATH=/home/user/mambaforge/envs/gtdbtk/share/gtdbtk-2.3.2/db && "
+Provide the path of the downloaded database in config/config.yaml via the gtdbtk_db keyword.
 
 ## PlasClass & PlasFlow
 Both packages can not be installed via conda without trouble.
