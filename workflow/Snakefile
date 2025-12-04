@@ -79,9 +79,10 @@ rule opt_read_filter:
     conda:
         "envs/python3.yaml"
     shell:
+        # Default command for optimized selection of longest, highest-quality reads
         "python scripts/select_filter_params_by_cov_sm.py -f {input} -s {params.genSize} -c {params.cov} --dump fastq -decall 2>&1 > {log}"
-        # "python scripts/select_filter_params_by_cov_sm.py -l 700 -q 9 -f {input} -s {params.genSize} -c 200 False --dump fastq 2>&1 > {log}" # for plasmid assembly
-        # "python scripts/select_filter_params_by_cov_sm.py -l 700 -q 9 -f {input} -s {params.genSize} -opt False --dump fastq 2>&1 > {log}" # for plasmid assembly
+        # Below command can be used for fixed-length cutoff assemblies, e.g. to enable discovery of smaller plasmids that might be selected against by picking long reads 
+        # "python scripts/select_filter_params_by_cov_sm.py -l 700 -q 9 -f {input} -s {params.genSize} -opt False -c 200 --dump fastq 2>&1 > {log}"
 
 
 rule porechop_barcodes_and_adapters:
@@ -338,7 +339,7 @@ rule circlator_fixstart:
     input:
         "results/{experiment}/{barcode}/{assembly}.fasta"
     output:
-        "results/{experiment}/{barcode}/circl_fixstart/{assembly}.oriented.fasta"#,
+        "results/{experiment}/{barcode}/circl_fixstart/{assembly}.oriented.fasta"
     params:
         out_prefix = "results/{experiment}/{barcode}/circl_fixstart/{assembly}.oriented"
     conda:
