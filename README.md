@@ -50,10 +50,15 @@ Use the automatic version with the shell script.
 Provide the path of the downloaded database in config/config.yaml via the gtdbtk_db keyword.
 
 ## PlasClass & PlasFlow
-Both packages can not be installed via conda without trouble.
+Both packages can't be installed via conda with full functionality and/or without trouble (e.g for plasclass 
+the script classify_fasta.py is missing when installed via conda; for PlasFlow installation via bioconda installs
+all dependencies but empty plasflow site-package).
+
 
 ### PlasClass
-The PlasClass package was small enough to have been included in this git repo in the pkgs folder.
+PlasClass is currently the only Plasmid identification instance in CobraHy.
+The package was small enough to have been included in this git repo in the pkgs folder 
+and thus requires no separate installation. 
 
 ### PlasFlow (deprecated; not currently included)
 PlasFlow still works very nicely and offers some functionality other packages don't,
