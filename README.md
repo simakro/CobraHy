@@ -23,7 +23,7 @@ For this:
         conda install -c bioconda gtdbtk=2.3.2
 
 
-When installation completes a message following message can be seen:
+When installation completes a message like the following can be seen:
 
     GTDB-Tk v2.3.2 requires ~78G of external data which needs to be downloaded
     and extracted. This can be done automatically, or manually.
@@ -50,22 +50,25 @@ Use the automatic version with the shell script.
 Provide the path of the downloaded database in config/config.yaml via the gtdbtk_db keyword.
 
 ## PlasClass & PlasFlow
+(PlasFLow procedure to be streamlined or replaced in the future)
 Both packages can not be installed via conda without trouble.
 Therefore I decided to place them as packages into the pkgs folder.
-The PlasClass package is small enough so I could include it in my github repository.
-However, PlasFlow is so big (65-85Mb) that I would not want to include it.
+The PlasClass package is small enough so it could be included it the github repository.
+However, PlasFlow is a bit to large (65-85Mb), so I did not not want to include it.
 It can be downloaded by cloning the PlasFlow repository into the pkgs folder.
 To avoid stacking repo within repo, the .git folder within PlasFlow package should be removed.
 !!!It is extremely important to be careful to only delete the .git in PlasFLow and not the main workflow!!!
 Thus change dir into PlasFLow and run rm .git only there.
 
 Plasflow installation:
-conda create -n plasflow python=3.5
-conda install -c bioconda perl-bioperl perl-getopt-long
-conda install -c anaconda pandas=0.18
-clone plasflow repository
-HOW TO INSTALL TENSORFLOW BEST (remember issue with same source tree as python)
-start with path/to/repo/PlasFlow.py
+
+    conda create -n plasflow python=3.5
+    conda install -c bioconda perl-bioperl perl-getopt-long
+    conda install -c anaconda pandas=0.18
+    clone plasflow repository
+    HOW TO INSTALL TENSORFLOW BEST (remember issue with same source tree as python)
+    start with path/to/repo/PlasFlow.py
+
 
 # Usage
 Edit config/config.yaml according to the requirments of your experiment(s).
@@ -106,7 +109,3 @@ Start pipeline with (insert desired number of threads for --cores):
 ```sh
 snakemake --use-conda --cores 32
 ```
-
-# Create DAG graph
-snakemake --dag | dot > DAG.dot
-dot -Tpng DAG.dot -o DAG2.png
