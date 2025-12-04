@@ -4,7 +4,10 @@ Hybrid assembly of bacterial genomes utilizing nanopore and illumina reads (COmb
 # Installation
 
 ## Workflow
-Clone repo to machine
+Clone the repo to your machine:
+
+    git clone https://github.com/simakro/CobraHy.git
+
 
 ## GTDBTK
 Although CobraHy does internally create a conda environment for GTDBTK, the database download is not included,
@@ -53,7 +56,6 @@ Provide the path of the downloaded database in config/config.yaml via the gtdbtk
 Both packages can't be installed via conda with full functionality and/or without trouble (e.g for plasclass 
 the script classify_fasta.py is missing when installed via conda; for PlasFlow installation via bioconda installs
 all dependencies but empty plasflow site-package).
-
 
 ### PlasClass
 PlasClass is currently the only Plasmid identification instance in CobraHy.
@@ -112,10 +114,10 @@ Sample_Info.json example:
 }
 ```
 
-Place the required long-read (nanopore) input data (an individual folder of fastq(.gz) file/s for each barcode) into the data folder so it has the following structure: data/{experiment}/{barcodeX}.
+Place the required long-read (nanopore) input data (an individual folder of fastq(.gz) file/s for each barcode) into the experiment folder in the data directory so it has the following structure: data/{experiment}/{barcodeX}.
 Place the associated short-reads (illumina) in a separate sub-folder in the experiment directory so it has the following structure: data/{experiment}/short-reads/{short_reads_for_ont_bcX}.
 
-Start pipeline with (insert desired number of threads for --cores): 
+To start the pipeline cd into cd CobraHy/workflow and run (insert desired number of threads for --cores): 
 ```sh
 snakemake --use-conda --cores 32
 ```
